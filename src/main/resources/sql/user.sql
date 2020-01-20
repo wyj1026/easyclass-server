@@ -1,6 +1,6 @@
 drop table users;
 
-CREATE TABLE users
+CREATE TABLE user
 (
   `id`         int(11)       NOT NULL AUTO_INCREMENT,
   `name`       varchar(1024) NOT NULL,
@@ -14,7 +14,7 @@ CREATE TABLE users
 )
   DEFAULT CHARSET = utf8;
 
-insert into users
+insert into user
 values (0,
         '王一杰',
         '特工的特',
@@ -22,3 +22,6 @@ values (0,
         '18812342213',
         'wangyijieim@outlook.com',
         'https://b-ssl.duitang.com/uploads/item/201810/18/20181018162951_kgwzm.thumb.700_0.jpeg');
+
+
+select * from user;
