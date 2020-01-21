@@ -15,7 +15,7 @@ CREATE TABLE user
   DEFAULT CHARSET = utf8;
 
 insert into user
-values (0,
+values (1,
         '王一杰',
         '特工的特',
         'tegongdete',
