@@ -1,8 +1,8 @@
-drop table users;
+drop table user;
 
 CREATE TABLE user
 (
-  `id`         int(11)       NOT NULL AUTO_INCREMENT,
+  `id`         int(11)       AUTO_INCREMENT,
   `name`       varchar(1024) NOT NULL,
   `nickname`       varchar(1024) NOT NULL,
   `password`   varchar(1024) NOT NULL,
