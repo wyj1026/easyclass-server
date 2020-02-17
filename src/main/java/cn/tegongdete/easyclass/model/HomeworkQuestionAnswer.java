@@ -12,7 +12,7 @@ public class HomeworkQuestionAnswer {
     private Integer classId;
     private String classname;
     private Integer questionNumber;
-    private Integer question;
+    private String question;
     private String answer;
     private Integer grade;
     private Boolean isObjective;

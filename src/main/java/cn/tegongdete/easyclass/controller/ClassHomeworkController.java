@@ -1,13 +1,12 @@
 package cn.tegongdete.easyclass.controller;
 
-import cn.tegongdete.easyclass.mapper.ClassMapper;
-import cn.tegongdete.easyclass.mapper.UserMapper;
-import cn.tegongdete.easyclass.model.Class;
+import cn.tegongdete.easyclass.mapper.ClassHomeworkMapper;
+import cn.tegongdete.easyclass.mapper.UserClassRoleMapper;
+import cn.tegongdete.easyclass.model.ClassHomework;
 import cn.tegongdete.easyclass.model.ResponseMessage;
-import cn.tegongdete.easyclass.model.User;
+import cn.tegongdete.easyclass.model.UserClassRole;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.swagger.annotations.Api;
-import jdk.internal.dynalink.support.ClassMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,31 +18,31 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Arrays;
 import java.util.List;
 
-@Api(tags = "Class Management")
+@Api(tags = "Homework Management")
 @RestController
-@RequestMapping("class")
-public class ClassController {
-    private static final Logger logger = LoggerFactory.getLogger(ClassController.class);
+@RequestMapping("homework")
+public class ClassHomeworkController {
+    private static final Logger logger = LoggerFactory.getLogger(ClassHomeworkController.class);
 
     @Autowired
-    private ClassMapper classMapper;
+    private ClassHomeworkMapper mapper;
 
     @PostMapping("/new")
-    public ResponseMessage signUp(Class clas) {
+    public ResponseMessage signUp(ClassHomework item) {
         try {
-            classMapper.insert(clas);
+            mapper.insert(item);
         }
         catch (Exception e) {
             logger.error("New Error", e);
             return ResponseMessage.fail();
         }
-        return ResponseMessage.success(clas);
+        return ResponseMessage.success(item);
     }
 
     @PostMapping("/update")
-    public ResponseMessage update(Class clas) {
+    public ResponseMessage update(ClassHomework item) {
         try {
-            classMapper.updateById(clas);
+            mapper.updateById(item);
         }
         catch (Exception e) {
             logger.error("Update Error", e);
@@ -56,7 +55,7 @@ public class ClassController {
     @GetMapping("/getById")
     public ResponseMessage getById(int id) {
         try {
-            Class u = classMapper.selectById(id);
+            ClassHomework u = mapper.selectById(id);
             return ResponseMessage.success(u);
         }
         catch (Exception e) {
@@ -65,14 +64,14 @@ public class ClassController {
         }
     }
 
-    @GetMapping("/getBatchById")
-    public ResponseMessage getBatchById(Integer[] id) {
+    @GetMapping("/deleteById")
+    public ResponseMessage deleteById(int id) {
         try {
-            List<Class> classes = classMapper.selectBatchIds(Arrays.asList(id));
-            return ResponseMessage.success(classes);
+            mapper.deleteById(id);
+            return ResponseMessage.success();
         }
         catch (Exception e) {
-            logger.error("GetBatchById Error", e);
+            logger.error("DeleteById Error", e);
             return ResponseMessage.fail();
         }
     }
