@@ -8,7 +8,7 @@ import lombok.Data;
 public class HomeworkQuestionAnswer {
     @TableId(type = IdType.AUTO)
     private Integer id;
-    private Integer gmtCreate;
+    private Long gmtCreate;
     private Integer classId;
     private String classname;
     private Integer questionNumber;

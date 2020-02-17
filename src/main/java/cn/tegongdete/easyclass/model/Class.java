@@ -9,7 +9,7 @@ public class Class {
     @TableId(type = IdType.AUTO)
     private Integer id;
     private String classname;
-    private Integer gmtStart;
+    private Long gmtStart;
     private String classDate;
     private String avatarUrl;
 }

@@ -8,14 +8,14 @@ import lombok.Data;
 public class ClassHomework {
     @TableId(type = IdType.AUTO)
     private Integer id;
-    private Integer gmtCreate;
+    private Long gmtCreate;
     private Integer classId;
     private String classname;
     private String homeworkTitle;
     private Integer questionNumber;
     private Integer totalGrade;
-    private Integer gmtStartUpload;
-    private Integer gmtStopUpload;
+    private Long gmtStartUpload;
+    private Long gmtStopUpload;
     private Boolean enableCommunicate;
     private Boolean enableAutoJudge;
     private Boolean enableJudgeByOthers;
