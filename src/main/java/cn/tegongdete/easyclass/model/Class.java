@@ -14,4 +14,5 @@ public class Class {
     private String avatarUrl;
     private String classDuration;
     private String description;
+    private String school;
 }
