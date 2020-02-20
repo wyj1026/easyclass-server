@@ -1,10 +1,12 @@
 package cn.tegongdete.easyclass.controller;
 
 import cn.tegongdete.easyclass.mapper.ClassMapper;
+import cn.tegongdete.easyclass.mapper.UserClassRoleMapper;
 import cn.tegongdete.easyclass.mapper.UserMapper;
 import cn.tegongdete.easyclass.model.Class;
 import cn.tegongdete.easyclass.model.ResponseMessage;
 import cn.tegongdete.easyclass.model.User;
+import cn.tegongdete.easyclass.model.UserClassRole;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.swagger.annotations.Api;
 import jdk.internal.dynalink.support.ClassMap;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Api(tags = "Class Management")
 @RestController
@@ -27,6 +30,9 @@ public class ClassController {
 
     @Autowired
     private ClassMapper classMapper;
+
+    @Autowired
+    private UserClassRoleMapper userClassRoleMapper;
 
     @PostMapping("/new")
     public ResponseMessage signUp(Class clas) {
@@ -73,6 +79,42 @@ public class ClassController {
         }
         catch (Exception e) {
             logger.error("GetBatchById Error", e);
+            return ResponseMessage.fail();
+        }
+    }
+
+    @GetMapping("/searchByName")
+    public ResponseMessage searchByName(String name) {
+        try {
+            List<Class> classes = classMapper.selectList(
+                    new QueryWrapper<Class>()
+                            .lambda()
+                            .like(Class::getClassname, name)
+            );
+            return ResponseMessage.success(classes);
+        }
+        catch (Exception e) {
+            logger.error("GetBatchById Error", e);
+            return ResponseMessage.fail();
+        }
+    }
+
+    @GetMapping("/getBatchByUserId")
+    public ResponseMessage getBatchByUserId(Integer id) {
+        logger.info(id.toString());
+        try {
+            List<UserClassRole> userClassRoles = userClassRoleMapper.selectList(new QueryWrapper<UserClassRole>()
+                    .lambda()
+                    .eq(UserClassRole::getId, id)
+            );
+            List<Integer> classIds = userClassRoles.stream().map(classRole -> {
+                return classRole.getClassId();
+            }).collect(Collectors.toList());
+            List<Class> classes = classMapper.selectBatchIds(classIds);
+            return ResponseMessage.success(classes);
+        }
+        catch (Exception e) {
+            logger.error("GetBatchByUserId Error", e);
             return ResponseMessage.fail();
         }
     }

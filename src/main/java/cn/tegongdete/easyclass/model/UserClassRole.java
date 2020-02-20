@@ -12,7 +12,7 @@ public class UserClassRole {
     private String username;
     private String school;
     private Integer classId;
-    private String className;
+    private String classname;
     private String role;
 
 }

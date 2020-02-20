@@ -12,4 +12,5 @@ public class Class {
     private Long gmtStart;
     private String classDate;
     private String avatarUrl;
+    private String classDuration;
 }

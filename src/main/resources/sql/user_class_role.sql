@@ -3,8 +3,8 @@ drop table user_class_role;
 CREATE TABLE user_class_role
 (
   `id`         int(11)       NOT NULL AUTO_INCREMENT,
-  `userid`     int(11) NOT NULL,
-  `user_name`       varchar(1024) NOT NULL,
+  `user_id`     int(11) NOT NULL,
+  `username`       varchar(1024) NOT NULL,
   `school`   varchar(1024) NOT NULL,
   `class_id` int(11) NOT NULL,
   `classname`      varchar(1024)   not null,
