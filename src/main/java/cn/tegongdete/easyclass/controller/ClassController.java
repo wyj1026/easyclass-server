@@ -8,6 +8,7 @@ import cn.tegongdete.easyclass.model.ResponseMessage;
 import cn.tegongdete.easyclass.model.User;
 import cn.tegongdete.easyclass.model.UserClassRole;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.google.common.collect.Lists;
 import io.swagger.annotations.Api;
 import jdk.internal.dynalink.support.ClassMap;
 import org.slf4j.Logger;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -105,11 +107,14 @@ public class ClassController {
         try {
             List<UserClassRole> userClassRoles = userClassRoleMapper.selectList(new QueryWrapper<UserClassRole>()
                     .lambda()
-                    .eq(UserClassRole::getId, id)
+                    .eq(UserClassRole::getUserId, id)
             );
             List<Integer> classIds = userClassRoles.stream().map(classRole -> {
                 return classRole.getClassId();
             }).collect(Collectors.toList());
+            if (classIds.isEmpty()) {
+                return ResponseMessage.success(Collections.emptyList());
+            }
             List<Class> classes = classMapper.selectBatchIds(classIds);
             return ResponseMessage.success(classes);
         }
