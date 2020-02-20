@@ -13,4 +13,5 @@ public class Class {
     private String classDate;
     private String avatarUrl;
     private String classDuration;
+    private String description;
 }

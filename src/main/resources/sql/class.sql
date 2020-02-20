@@ -8,6 +8,7 @@ CREATE TABLE class
   `class_date`   varchar(1024) NOT NULL,
   `class_duration`      int(11)   not null,
   `avatar_url` varchar(1024) default 'default_avatar_url.jpg',
+  `description` varchar(1024) default '',
 
   PRIMARY KEY (`id`)
 )
@@ -19,7 +20,8 @@ values (1,
         1579610044222,
         '周一上午第二节',
         16,
-        'https://b-ssl.duitang.com/uploads/item/201810/18/20181018162951_kgwzm.thumb.700_0.jpeg');
+        'https://b-ssl.duitang.com/uploads/item/201810/18/20181018162951_kgwzm.thumb.700_0.jpeg',
+        '');
 
 
 select * from class;
