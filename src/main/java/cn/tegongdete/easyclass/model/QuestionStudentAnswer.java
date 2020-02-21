@@ -15,7 +15,7 @@ public class QuestionStudentAnswer {
     private String username;
     private Integer homeworkQuestionId;
     private String studentQuestionAnswer;
-    private String grade;
+    private Integer grade;
     private Long gmtUpload;
     private Long gmtJudge;
     private String comment;
