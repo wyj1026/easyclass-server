@@ -4,8 +4,11 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 
+import java.util.List;
+import java.util.Map;
+
 @Data
-public class HomeworkQuestionAnswer {
+public class HomeworkQuestionAnswerWrap {
     @TableId(type = IdType.AUTO)
     private Integer id;
     private Long gmtCreate;
@@ -14,7 +17,7 @@ public class HomeworkQuestionAnswer {
     private String classname;
     private Integer questionNumber;
     private String question;
-    private String answer;
+    private Map<String, List> answer;
     private Integer grade;
     private Boolean isObjective;
     private Boolean isMultity;

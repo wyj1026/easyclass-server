@@ -11,9 +11,9 @@ CREATE TABLE class_homework
   `total_grade`   int(11) NOT NULL,
   `gmt_start_upload` bigint(14) not null ,
   `gmt_stop_upload`  bigint(14) not null ,
-  `enable_communicate` int(1) not null ,
-  `enable_auto_judge` int(1) not null ,
-  `enable_judge_by_others` int(1) not null ,
+  `enable_communicate` bool default false ,
+  `enable_auto_judge` bool default false ,
+  `enable_judge_by_others` bool default false ,
   PRIMARY KEY (`id`)
 )
   DEFAULT CHARSET = utf8;
@@ -28,9 +28,9 @@ values (1,
         100,
         1579610044222,
         1579610044222,
-        1,
-        1,
-        1);
+        false ,
+        false ,
+        false );
 
 
 select * from class_homework;

@@ -2,15 +2,25 @@ package cn.tegongdete.easyclass.controller;
 
 import cn.tegongdete.easyclass.mapper.HomeworkQuestionAnswerMapper;
 import cn.tegongdete.easyclass.model.HomeworkQuestionAnswer;
+import cn.tegongdete.easyclass.model.HomeworkQuestionAnswerBatch;
+import cn.tegongdete.easyclass.model.HomeworkQuestionAnswerWrap;
 import cn.tegongdete.easyclass.model.ResponseMessage;
+import com.alibaba.fastjson.JSON;
+import com.fasterxml.jackson.core.JsonEncoding;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
 import io.swagger.annotations.Api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.codec.json.Jackson2JsonEncoder;
+import org.springframework.web.bind.annotation.*;
+import springfox.documentation.spring.web.json.Json;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Api(tags = "Homework Question Management")
 @RestController
@@ -31,6 +41,35 @@ public class HomeworkQuestionAnswerController {
             return ResponseMessage.fail();
         }
         return ResponseMessage.success(item);
+    }
+
+    @PostMapping("/newbatch")
+    public ResponseMessage newbatch(@RequestBody HomeworkQuestionAnswerBatch batch) {
+        try {
+            List<HomeworkQuestionAnswer> answers = Arrays.asList(batch.getQuestions()).stream().map((item)-> {
+                HomeworkQuestionAnswer answer = new HomeworkQuestionAnswer();
+                answer.setGmtCreate(item.getGmtCreate());
+                answer.setClassId(item.getClassId());
+                answer.setClassname(item.getClassname());
+                answer.setQuestionNumber(item.getQuestionNumber());
+                answer.setQuestion(item.getQuestion());
+                answer.setGrade(item.getGrade());
+                answer.setIsMultity(item.getIsMultity());
+                answer.setIsObjective(item.getIsObjective());
+                answer.setHomeworkId(item.getHomeworkId());
+                answer.setAnswer(JSON.toJSONString(item.getAnswer()));
+                return answer;
+            }).collect(Collectors.toList());
+            for (HomeworkQuestionAnswer answer: answers) {
+                logger.info(answer.getQuestion());
+                mapper.insert(answer);
+            }
+        }
+        catch (Exception e) {
+            logger.error("New Error", e);
+            return ResponseMessage.fail();
+        }
+        return ResponseMessage.success();
     }
 
     @PostMapping("/update")
