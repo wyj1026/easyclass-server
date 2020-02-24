@@ -10,7 +10,7 @@ CREATE TABLE question_student_answer
   `username`                varchar(1024) NOT NULL,
   `homework_question_id`    int(11)       NOT NULL,
   `student_question_answer` varchar(1024) NOT NULL,
-  `grage`                   int(11)                default NULL,
+  `grade`                   int(11)                default NULL,
   `gmt_upload`              bigint(14),
   `gmt_judge`               bigint(14),
   `comment`                 varchar(1024)          default null,

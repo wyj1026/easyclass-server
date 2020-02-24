@@ -2,9 +2,11 @@ package cn.tegongdete.easyclass.controller;
 
 import cn.tegongdete.easyclass.mapper.ClassHomeworkMapper;
 import cn.tegongdete.easyclass.mapper.UserClassRoleMapper;
-import cn.tegongdete.easyclass.model.ClassHomework;
-import cn.tegongdete.easyclass.model.ResponseMessage;
-import cn.tegongdete.easyclass.model.UserClassRole;
+import cn.tegongdete.easyclass.model.*;
+import cn.tegongdete.easyclass.service.HomeworkService;
+import cn.tegongdete.easyclass.service.QuestionService;
+import cn.tegongdete.easyclass.service.SummaryService;
+import cn.tegongdete.easyclass.service.UserRoleService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.swagger.annotations.Api;
 import org.slf4j.Logger;
@@ -15,8 +17,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Api(tags = "Homework Management")
 @RestController
@@ -25,12 +28,24 @@ public class ClassHomeworkController {
     private static final Logger logger = LoggerFactory.getLogger(ClassHomeworkController.class);
 
     @Autowired
-    private ClassHomeworkMapper mapper;
+    private ClassHomeworkMapper classHomeworkMapper;
+
+    @Autowired
+    private UserRoleService userRoleService;
+
+    @Autowired
+    private HomeworkService homeworkService;
+
+    @Autowired
+    private SummaryService summaryService;
+
+    @Autowired
+    private QuestionService questionService;
 
     @PostMapping("/new")
     public ResponseMessage signUp(ClassHomework item) {
         try {
-            mapper.insert(item);
+            classHomeworkMapper.insert(item);
         }
         catch (Exception e) {
             logger.error("New Error", e);
@@ -42,7 +57,7 @@ public class ClassHomeworkController {
     @PostMapping("/update")
     public ResponseMessage update(ClassHomework item) {
         try {
-            mapper.updateById(item);
+            classHomeworkMapper.updateById(item);
         }
         catch (Exception e) {
             logger.error("Update Error", e);
@@ -55,7 +70,7 @@ public class ClassHomeworkController {
     @GetMapping("/getById")
     public ResponseMessage getById(int id) {
         try {
-            ClassHomework u = mapper.selectById(id);
+            ClassHomework u = classHomeworkMapper.selectById(id);
             return ResponseMessage.success(u);
         }
         catch (Exception e) {
@@ -67,11 +82,150 @@ public class ClassHomeworkController {
     @GetMapping("/deleteById")
     public ResponseMessage deleteById(int id) {
         try {
-            mapper.deleteById(id);
+            classHomeworkMapper.deleteById(id);
             return ResponseMessage.success();
         }
         catch (Exception e) {
             logger.error("DeleteById Error", e);
+            return ResponseMessage.fail();
+        }
+    }
+
+    @GetMapping("/getToCommitByUserId")
+    public ResponseMessage getToCommitByUserId(Integer id) {
+        try {
+            List<ClassHomework> toCommit = new ArrayList<>();
+            List<Integer> classIds = userRoleService.getClassesByUserId(id, "student");
+            if (classIds.isEmpty()) return ResponseMessage.success(toCommit);
+            List<ClassHomework> homeworks = homeworkService.getHomeworksByClassId(classIds);
+            if (homeworks.isEmpty()) return ResponseMessage.success(toCommit);
+            List<Integer> answeredHomeworks = questionService.getQuestionAnswers(id).stream().map(questionStudentAnswer -> {
+                return questionStudentAnswer.getHomeworkId();
+            }).collect(Collectors.toList());
+            for (ClassHomework homework: homeworks) {
+                if (!answeredHomeworks.contains(homework.getId())) {
+                    toCommit.add(homework);
+                }
+            }
+            return ResponseMessage.success(toCommit);
+        }
+        catch (Exception e) {
+            logger.error("GetBatchById Error", e);
+            return ResponseMessage.fail();
+        }
+    }
+
+
+    @GetMapping("/getNotJudgedByUserId")
+    public ResponseMessage getNotJudgedByUserId(Integer id) {
+        try {
+            List<ClassHomework> toCommit = new ArrayList<>();
+            List<Integer> classIds = userRoleService.getClassesByUserId(id, "student");
+            if (classIds.isEmpty()) return ResponseMessage.success(toCommit);
+            List<ClassHomework> homeworks = homeworkService.getHomeworksByClassId(classIds);
+            if (homeworks.isEmpty()) return ResponseMessage.success(toCommit);
+            List<QuestionStudentSummary> summaries = summaryService.getCommitted(id);
+            for (ClassHomework homework: homeworks) {
+                if (!summaries.isEmpty()) toCommit.add(homework);
+                for (QuestionStudentSummary summary: summaries) {
+                    if (summary.getHomeworkId().equals(toCommit.get(toCommit.size()-1).getId())) {
+                        toCommit.remove(toCommit.size()-1);
+                        break;
+                    }
+                }
+            }
+            return ResponseMessage.success(toCommit);
+        }
+        catch (Exception e) {
+            logger.error("GetBatchById Error", e);
+            return ResponseMessage.fail();
+        }
+    }
+
+    @GetMapping("/getJudgedByUserId")
+    public ResponseMessage getJudgedByUserId(Integer id) {
+        try {
+            List<ClassHomework> judged = new ArrayList<>();
+            List<Integer> classIds = userRoleService.getClassesByUserId(id, "student");
+            if (classIds.isEmpty()) return ResponseMessage.success(judged);
+            List<ClassHomework> homeworks = homeworkService.getHomeworksByClassId(classIds);
+            List<QuestionStudentSummary> summaries = summaryService.getCommitted(id);
+            for (ClassHomework homework: homeworks) {
+                for (QuestionStudentSummary summary: summaries) {
+                    if (summary.getHomeworkId().equals(homework.getId())) {
+                        judged.add(homework);
+                        break;
+                    }
+                }
+            }
+            return ResponseMessage.success(judged);
+        }
+        catch (Exception e) {
+            logger.error("GetBatchById Error", e);
+            return ResponseMessage.fail();
+        }
+    }
+
+
+    @GetMapping("/getPushedByTeacherUserId")
+    public ResponseMessage getPushedByTeacherUserId(Integer id) {
+        try {
+            List<Integer> classIds = userRoleService.getClassesByUserId(id, "teacher");
+            if (classIds.isEmpty()) return ResponseMessage.success(new ArrayList<>());
+            List<ClassHomework> homeworks = homeworkService.getHomeworksByClassId(classIds);
+            return ResponseMessage.success(homeworks);
+        }
+        catch (Exception e) {
+            logger.error("GetBatchById Error", e);
+            return ResponseMessage.fail();
+        }
+    }
+
+
+    @GetMapping("/getToJudgeByTeacherUserId")
+    public ResponseMessage getToJudgeByTeacherUserId(Integer id) {
+        try {
+            List<Integer> classIds = userRoleService.getClassesByUserId(id, "teacher");
+            if (classIds.isEmpty()) return ResponseMessage.success(new ArrayList<>());
+            List<ClassHomework> homeworks = homeworkService.getHomeworksByClassId(classIds);
+            List<ClassHomework> result = new ArrayList<>();
+            for (ClassHomework homework: homeworks) {
+                Integer homeworkId = homework.getId();
+                Integer questionNumber = homework.getQuestionNumber();
+                List<QuestionStudentAnswer> answers = questionService.getQuestionAnswersByHomeworkId(homeworkId);
+                List<QuestionStudentSummary> summaries = summaryService.getCommittedByHomeworkId(homeworkId);
+                if (answers.size() != summaries.size() * homework.getQuestionNumber()) {
+                    result.add(homework);
+                }
+            }
+            return ResponseMessage.success(result);
+        }
+        catch (Exception e) {
+            logger.error("GetBatchById Error", e);
+            return ResponseMessage.fail();
+        }
+    }
+
+    @GetMapping("/getJudgedByTeacherUserId")
+    public ResponseMessage getJudgedByTeacherUserId(Integer id) {
+        try {
+            List<Integer> classIds = userRoleService.getClassesByUserId(id, "teacher");
+            if (classIds.isEmpty()) return ResponseMessage.success(new ArrayList<>());
+            List<ClassHomework> homeworks = homeworkService.getHomeworksByClassId(classIds);
+            List<ClassHomework> result = new ArrayList<>();
+            for (ClassHomework homework: homeworks) {
+                Integer homeworkId = homework.getId();
+                Integer questionNumber = homework.getQuestionNumber();
+                List<QuestionStudentAnswer> answers = questionService.getQuestionAnswersByHomeworkId(homeworkId);
+                List<QuestionStudentSummary> summaries = summaryService.getCommittedByHomeworkId(homeworkId);
+                if (answers.size() != 0 && answers.size() == summaries.size() * homework.getQuestionNumber()) {
+                    result.add(homework);
+                }
+            }
+            return ResponseMessage.success(result);
+        }
+        catch (Exception e) {
+            logger.error("GetBatchById Error", e);
             return ResponseMessage.fail();
         }
     }

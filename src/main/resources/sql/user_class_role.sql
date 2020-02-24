@@ -21,6 +21,22 @@ values (1,
         1,
         '数据结构',
         '学生');
+insert into user_class_role
+values (2,
+        3,
+        'adf',
+        '北京交通大学',
+        1,
+        '数据结构',
+        'student');
+insert into user_class_role
+values (3,
+        3,
+        'adf',
+        '北京交通大学',
+        1,
+        '数据结构',
+        'teacher');
 
 
 select * from user_class_role;
