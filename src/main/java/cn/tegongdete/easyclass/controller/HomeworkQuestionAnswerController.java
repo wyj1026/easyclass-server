@@ -88,8 +88,20 @@ public class HomeworkQuestionAnswerController {
     @GetMapping("/getById")
     public ResponseMessage getById(int id) {
         try {
-            HomeworkQuestionAnswer u = mapper.selectById(id);
-            return ResponseMessage.success(u);
+            HomeworkQuestionAnswer item = mapper.selectById(id);
+            HomeworkQuestionAnswerWrap answer = new HomeworkQuestionAnswerWrap();
+            answer.setGmtCreate(item.getGmtCreate());
+            answer.setClassId(item.getClassId());
+            answer.setClassname(item.getClassname());
+            answer.setQuestionNumber(item.getQuestionNumber());
+            answer.setQuestion(item.getQuestion());
+            answer.setGrade(item.getGrade());
+            answer.setIsMultity(item.getIsMultity());
+            answer.setIsObjective(item.getIsObjective());
+            answer.setHomeworkId(item.getHomeworkId());
+            JSON.parse(item.getAnswer());
+            answer.setAnswer((Map<String, List>) JSON.parse(item.getAnswer()));
+            return ResponseMessage.success(answer);
         }
         catch (Exception e) {
             logger.error("GetById Error", e);
