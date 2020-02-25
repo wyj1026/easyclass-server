@@ -1,11 +1,9 @@
 package cn.tegongdete.easyclass.controller;
 
 import cn.tegongdete.easyclass.mapper.HomeworkQuestionAnswerMapper;
-import cn.tegongdete.easyclass.model.HomeworkQuestionAnswer;
-import cn.tegongdete.easyclass.model.HomeworkQuestionAnswerBatch;
-import cn.tegongdete.easyclass.model.HomeworkQuestionAnswerWrap;
-import cn.tegongdete.easyclass.model.ResponseMessage;
+import cn.tegongdete.easyclass.model.*;
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -17,6 +15,7 @@ import org.springframework.http.codec.json.Jackson2JsonEncoder;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.spring.web.json.Json;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -99,9 +98,41 @@ public class HomeworkQuestionAnswerController {
             answer.setIsMultity(item.getIsMultity());
             answer.setIsObjective(item.getIsObjective());
             answer.setHomeworkId(item.getHomeworkId());
+            answer.setId(item.getId());
             JSON.parse(item.getAnswer());
             answer.setAnswer((Map<String, List>) JSON.parse(item.getAnswer()));
             return ResponseMessage.success(answer);
+        }
+        catch (Exception e) {
+            logger.error("GetById Error", e);
+            return ResponseMessage.fail();
+        }
+    }
+
+    @GetMapping("/getBatchByHomeworkId")
+    public ResponseMessage getBatchByHomeworkId(int id) {
+        try {
+            List<HomeworkQuestionAnswer> items = mapper.selectList(new QueryWrapper<HomeworkQuestionAnswer>()
+                    .lambda()
+                    .eq(HomeworkQuestionAnswer::getHomeworkId, id));
+            List<HomeworkQuestionAnswerWrap> answers = items.stream().map((item) -> {
+                HomeworkQuestionAnswerWrap answer = new HomeworkQuestionAnswerWrap();
+                answer.setGmtCreate(item.getGmtCreate());
+                answer.setClassId(item.getClassId());
+                answer.setClassname(item.getClassname());
+                answer.setQuestionNumber(item.getQuestionNumber());
+                answer.setQuestion(item.getQuestion());
+                answer.setGrade(item.getGrade());
+                answer.setIsMultity(item.getIsMultity());
+                answer.setIsObjective(item.getIsObjective());
+                answer.setId(item.getId());
+                answer.setHomeworkId(item.getHomeworkId());
+                JSON.parse(item.getAnswer());
+                answer.setAnswer((Map<String, List>) JSON.parse(item.getAnswer()));
+                return answer;
+            }).collect(Collectors.toList());
+
+            return ResponseMessage.success(answers);
         }
         catch (Exception e) {
             logger.error("GetById Error", e);

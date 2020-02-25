@@ -2,17 +2,17 @@ package cn.tegongdete.easyclass.controller;
 
 import cn.tegongdete.easyclass.mapper.HomeworkQuestionAnswerMapper;
 import cn.tegongdete.easyclass.mapper.QuestionStudentAnswerMapper;
-import cn.tegongdete.easyclass.model.HomeworkQuestionAnswer;
-import cn.tegongdete.easyclass.model.QuestionStudentAnswer;
-import cn.tegongdete.easyclass.model.ResponseMessage;
+import cn.tegongdete.easyclass.model.*;
+import com.alibaba.fastjson.JSON;
 import io.swagger.annotations.Api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Api(tags = "Student Answer Management")
 @RestController
@@ -33,6 +33,36 @@ public class QuestionStudentAnswerController {
             return ResponseMessage.fail();
         }
         return ResponseMessage.success(item);
+    }
+
+    @PostMapping("/newbatch")
+    public ResponseMessage newbatch(@RequestBody StudentQuestionAnswerBatch batch) {
+        try {
+            List<QuestionStudentAnswer> answers = Arrays.asList(batch.getAnswers()).stream().map((item)-> {
+                QuestionStudentAnswer answer = new QuestionStudentAnswer();
+                answer.setClassId(item.getClassId());
+                answer.setClassname(item.getClassname());
+                answer.setHomeworkId(item.getHomeworkId());
+                answer.setUserId(item.getUserId());
+                answer.setUsername(item.getUsername());
+                answer.setHomeworkQuestionId(item.getHomeworkQuestionId());
+                answer.setStudentQuestionAnswer(JSON.toJSONString(item.getStudentQuestionAnswer()));
+                answer.setGmtUpload(item.getGmtUpload());
+                answer.setGrade(item.getGrade());
+                answer.setGmtJudge(item.getGmtJudge());
+                answer.setComment(item.getComment());
+                return answer;
+            }).collect(Collectors.toList());
+            for (QuestionStudentAnswer answer: answers) {
+                logger.info(answer.getStudentQuestionAnswer());
+                mapper.insert(answer);
+            }
+        }
+        catch (Exception e) {
+            logger.error("New Error", e);
+            return ResponseMessage.fail();
+        }
+        return ResponseMessage.success();
     }
 
     @PostMapping("/update")

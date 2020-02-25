@@ -12,7 +12,7 @@ CREATE TABLE question_student_answer
   `student_question_answer` varchar(1024) NOT NULL,
   `grade`                   int(11)                default NULL,
   `gmt_upload`              bigint(14),
-  `gmt_judge`               bigint(14),
+  `gmt_judge`               bigint(14)  default NULL,
   `comment`                 varchar(1024)          default null,
 
   PRIMARY KEY (`id`)
