@@ -25,5 +25,15 @@ values (1,
         'https://b-ssl.duitang.com/uploads/item/201810/18/20181018162951_kgwzm.thumb.700_0.jpeg',
         '');
 
+insert into user
+values (3,
+        '王一杰',
+        '特工的特',
+        'tegongdete',
+        '18812342213',
+        'wangyijieim@outlook.com',
+        'https://b-ssl.duitang.com/uploads/item/201810/18/20181018162951_kgwzm.thumb.700_0.jpeg',
+        '');
+
 
 select * from user;
