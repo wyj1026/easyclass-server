@@ -124,9 +124,16 @@ public class ClassHomeworkController {
             if (classIds.isEmpty()) return ResponseMessage.success(toCommit);
             List<ClassHomework> homeworks = homeworkService.getHomeworksByClassId(classIds);
             if (homeworks.isEmpty()) return ResponseMessage.success(toCommit);
+            List<Integer> answeredHomeworks = questionService.getQuestionAnswers(id).stream().map(questionStudentAnswer -> {
+                return questionStudentAnswer.getHomeworkId();
+            }).collect(Collectors.toList());
             List<QuestionStudentSummary> summaries = summaryService.getCommitted(id);
             for (ClassHomework homework: homeworks) {
-                if (!summaries.isEmpty()) toCommit.add(homework);
+                for (Integer answeredId: answeredHomeworks) {
+                    if (homework.getId().equals(answeredId)) {
+                        toCommit.add(homework);
+                    }
+                }
                 for (QuestionStudentSummary summary: summaries) {
                     if (summary.getHomeworkId().equals(toCommit.get(toCommit.size()-1).getId())) {
                         toCommit.remove(toCommit.size()-1);
