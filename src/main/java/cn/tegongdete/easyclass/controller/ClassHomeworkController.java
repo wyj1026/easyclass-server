@@ -18,7 +18,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Api(tags = "Homework Management")
@@ -124,22 +126,23 @@ public class ClassHomeworkController {
             if (classIds.isEmpty()) return ResponseMessage.success(toCommit);
             List<ClassHomework> homeworks = homeworkService.getHomeworksByClassId(classIds);
             if (homeworks.isEmpty()) return ResponseMessage.success(toCommit);
-            List<Integer> answeredHomeworks = questionService.getQuestionAnswers(id).stream().map(questionStudentAnswer -> {
+            Set<Integer> answeredHomeworks = questionService.getQuestionAnswers(id).stream().map(questionStudentAnswer -> {
                 return questionStudentAnswer.getHomeworkId();
-            }).collect(Collectors.toList());
+            }).collect(Collectors.toSet());
             List<QuestionStudentSummary> summaries = summaryService.getCommitted(id);
             for (ClassHomework homework: homeworks) {
                 for (Integer answeredId: answeredHomeworks) {
                     if (homework.getId().equals(answeredId)) {
                         toCommit.add(homework);
+                        for (QuestionStudentSummary summary: summaries) {
+                            if (!toCommit.isEmpty() && summary.getHomeworkId().equals(toCommit.get(toCommit.size()-1).getId())) {
+                                toCommit.remove(toCommit.size()-1);
+                                break;
+                            }
+                        }
                     }
                 }
-                for (QuestionStudentSummary summary: summaries) {
-                    if (summary.getHomeworkId().equals(toCommit.get(toCommit.size()-1).getId())) {
-                        toCommit.remove(toCommit.size()-1);
-                        break;
-                    }
-                }
+
             }
             return ResponseMessage.success(toCommit);
         }

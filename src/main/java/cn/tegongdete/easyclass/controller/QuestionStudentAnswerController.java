@@ -4,6 +4,7 @@ import cn.tegongdete.easyclass.mapper.HomeworkQuestionAnswerMapper;
 import cn.tegongdete.easyclass.mapper.QuestionStudentAnswerMapper;
 import cn.tegongdete.easyclass.mapper.UserMapper;
 import cn.tegongdete.easyclass.model.*;
+import cn.tegongdete.easyclass.service.SummaryService;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.mysql.cj.xdevapi.JsonArray;
@@ -29,6 +30,9 @@ public class QuestionStudentAnswerController {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private SummaryService summaryService;
 
     @PostMapping("/new")
     public ResponseMessage signUp(QuestionStudentAnswer item) {
@@ -91,6 +95,7 @@ public class QuestionStudentAnswerController {
                 answer.setComment(item.getComment());
                 return answer;
             }).collect(Collectors.toList());
+            summaryService.saveSummary(answers);
             for (QuestionStudentAnswer answer: answers) {
                 logger.info(answer.getStudentQuestionAnswer());
                 mapper.updateById(answer);
