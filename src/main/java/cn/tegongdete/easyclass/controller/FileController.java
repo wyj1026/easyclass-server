@@ -31,7 +31,7 @@ public class FileController {
     }
 
 
-    @GetMapping("/files/{filename:.+}")
+    @GetMapping("/download/{filename:.+}")
     @ResponseBody
     public ResponseEntity<Resource> getFile(HttpServletResponse response, @PathVariable String filename) {
         try {
@@ -62,7 +62,7 @@ public class FileController {
 
     }
 
-    @PostMapping("/")
+    @PostMapping("/upload")
     public ResponseMessage uploadFile(@RequestParam("file") MultipartFile file) {
         try {
             storageService.store(file);
