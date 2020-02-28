@@ -239,4 +239,69 @@ public class ClassHomeworkController {
             return ResponseMessage.fail();
         }
     }
+
+    @GetMapping("/after")
+    public ResponseMessage getHomeworkAfterDate(Integer id, Long timestamp) {
+        try {
+            List<ClassHomework> toCommit = new ArrayList<>();
+            List<Integer> classIds = userRoleService.getClassesByUserId(id, "student");
+            if (classIds.isEmpty()) return ResponseMessage.success(toCommit);
+            List<ClassHomework> homeworks = homeworkService.getHomeworksByClassId(classIds);
+
+            for (ClassHomework classHomework: homeworks) {
+                if (classHomework.getGmtCreate() > timestamp) {
+                    toCommit.add(classHomework);
+                }
+            }
+            return ResponseMessage.success(toCommit);
+        }
+        catch (Exception e) {
+            logger.error("GetHomeworkAfterDate Error", e);
+            return ResponseMessage.fail();
+        }
+    }
+
+    @GetMapping("/near")
+    public ResponseMessage getHomeworkNearDate(Integer id, Long timestamp) {
+        try {
+            List<ClassHomework> toCommit = new ArrayList<>();
+            List<Integer> classIds = userRoleService.getClassesByUserId(id, "student");
+            if (classIds.isEmpty()) return ResponseMessage.success(toCommit);
+            List<ClassHomework> homeworks = homeworkService.getHomeworksByClassId(classIds);
+
+            for (ClassHomework classHomework: homeworks) {
+                if (classHomework.getGmtStopUpload() < timestamp) {
+                    toCommit.add(classHomework);
+                }
+            }
+            return ResponseMessage.success(toCommit);
+        }
+        catch (Exception e) {
+            logger.error("GetHomeworkNearDate Error", e);
+            return ResponseMessage.fail();
+        }
+    }
+
+
+    @GetMapping("/stop")
+    public ResponseMessage getHomeworkStoppedUpload(Integer id, Long timestamp) {
+        try {
+            List<ClassHomework> toCommit = new ArrayList<>();
+            List<Integer> classIds = userRoleService.getClassesByUserId(id, "teacher");
+            if (classIds.isEmpty()) return ResponseMessage.success(toCommit);
+            List<ClassHomework> homeworks = homeworkService.getHomeworksByClassId(classIds);
+
+            for (ClassHomework classHomework: homeworks) {
+                if (classHomework.getGmtStopUpload() < timestamp) {
+                    toCommit.add(classHomework);
+                }
+            }
+            return ResponseMessage.success(toCommit);
+        }
+        catch (Exception e) {
+            logger.error("GetHomeworkStoppedUpload Error", e);
+            return ResponseMessage.fail();
+        }
+    }
+
 }
