@@ -2,6 +2,7 @@ package cn.tegongdete.easyclass.controller;
 
 import cn.tegongdete.easyclass.mapper.ClassMapper;
 import cn.tegongdete.easyclass.mapper.UserClassRoleMapper;
+import cn.tegongdete.easyclass.mapper.UserMapper;
 import cn.tegongdete.easyclass.model.Class;
 import cn.tegongdete.easyclass.model.ResponseMessage;
 import cn.tegongdete.easyclass.model.User;
@@ -16,8 +17,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 @Api(tags = "Role Management")
 @RestController
@@ -27,6 +31,9 @@ public class UserClassRoleController {
 
     @Autowired
     private UserClassRoleMapper mapper;
+
+    @Autowired
+    private UserMapper userMapper;
 
     @PostMapping("/new")
     public ResponseMessage signUp(UserClassRole role) {
@@ -70,6 +77,31 @@ public class UserClassRoleController {
         try {
             List<UserClassRole> classes = mapper.selectBatchIds(Arrays.asList(id));
             return ResponseMessage.success(classes);
+        }
+        catch (Exception e) {
+            logger.error("GetBatchById Error", e);
+            return ResponseMessage.fail();
+        }
+    }
+
+
+    @GetMapping("/getClassTeachers")
+    public ResponseMessage getClassTeachers(Integer id) {
+        try {
+            List<UserClassRole> classes = mapper.selectList(
+                    new QueryWrapper<UserClassRole>()
+                            .lambda()
+                            .eq(UserClassRole::getClassId, id)
+                            .eq(UserClassRole::getRole, "teacher")
+            );
+            if (classes.isEmpty()) {
+                return ResponseMessage.success(new ArrayList());
+            }
+
+            List<User> users = userMapper.selectBatchIds(
+                    classes.stream().map((c) -> {return c.getUserId();}).collect(Collectors.toList())
+            );
+            return ResponseMessage.success(users);
         }
         catch (Exception e) {
             logger.error("GetBatchById Error", e);
